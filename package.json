@@ -1,0 +1,15 @@
+{
+  "name": "dogecoin_listener",
+  "version": "1.0.0",
+  "description": "an http interface to dogecoind",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "The Unlicense <http://unlicense.org/>",
+  "dependencies": {
+    "node-dogecoin": "^0.3.8",
+    "express": "^4.0.0"
+  }
+}
