@@ -4,8 +4,8 @@ var express = require('express');
 var expressValidator = require('express-validator');
 
 dogecoin.set('user', 'dogegate');
-dogecoin.set('password', "rGtrDFTRz9CSWHypuQHygDxkPFS5wsK2mr");
-dogecoin.auth('dogegate', "rGtrDFTRz9CSWHypuQHygDxkPFS5wsK2mr");
+dogecoin.set('password', process.env.DOGECOIND_PASSWORD);
+dogecoin.auth('dogegate', process.env.DOGECOIND_PASSWORD);
 
 var app = express();
 app.use(expressValidator());
@@ -79,7 +79,7 @@ controller.listReceivedByAddress = function(req, res) {
 
 controller.getReceivedByAccount = function(req, res) {
 
-  dogecoin.getreceivedbyaccount('', function(err, received) {
+  dogecoin.getreceivedbyaccount('', 2, function(err, received) {
     if (err) {
       res.send(500, { error: err }); return;
     } else {
@@ -127,15 +127,19 @@ controller.listReceivedByAccount = function(req, res) {
 
 controller.sendToAddress = function(req, res) {
 
-  req.checkBody('address', 'Invalid receive dogecoin address').notEmpty();
-  req.checkBody('amount', 'Invalid amount to send').notEmpty().isNumeric();
+  console.log('body', req.body);
+  console.log('params', req.params);
+  console.log('query', req.query);
+
+  req.checkParams('address', 'Invalid receive dogecoin address').notEmpty();
+  req.checkParams('amount', 'Invalid amount to send').notEmpty().isNumeric();
 
   if (errors = req.validationErrors()){
     res.send(400, errors);
     return;
   }
 
-  dogecoin.sendtoaddress(function(err, transaction) {
+  dogecoin.sendtoaddress(req.params.address, req.params.amount, function(err, transaction) {
     if (err) {
       res.send(500, { error: err }); return;
     } else {
@@ -145,16 +149,38 @@ controller.sendToAddress = function(req, res) {
 
 };
 
-app.get('/v1/getinfo', controller.getInfo);
-app.get('/v1/getaddresses', controller.getAddresses);
-app.get('/v1/listtransactions', controller.listTransactions);
-app.get('/v1/getnewaddress', controller.getNewAddress);
-app.get('/v1/gettransaction', controller.getTransaction);
-app.get('/v1/listreceivedbyaddress', controller.listReceivedByAddress);
-app.get('/v1/listreceivedbyaccount', controller.listReceivedByAccount);
-app.get('/v1/getreceivedbyaccount', controller.getReceivedByAccount);
-app.get('/v1/getreceivedbyaddress/:address', controller.getReceivedByAddress);
-app.post('/v1/sendtoaddress', controller.sendToAddress);
+var passport = require('passport');
+var BasicStrategy = require('passport-http').BasicStrategy;
+
+passport.use(new BasicStrategy(
+  function(userid, password, done) {
+    if (userid === 'admin'){
+      if (password === process.env.BASIC_AUTH_PASSWORD){
+        done(null, true);
+      } else {
+        done(null, false);
+      }
+    } else {
+      done(null, false);
+    }   
+  }
+));
+
+function basicAuth(){
+  return passport.authenticate('basic', { session: false });
+}
+app.use(passport.initialize());
+
+app.get('/v1/getinfo', basicAuth(), controller.getInfo);
+app.get('/v1/getaddresses', basicAuth(), controller.getAddresses);
+app.get('/v1/listtransactions', basicAuth(), controller.listTransactions);
+app.get('/v1/getnewaddress', basicAuth(), controller.getNewAddress);
+app.get('/v1/gettransaction', basicAuth(), controller.getTransaction);
+app.get('/v1/listreceivedbyaddress', basicAuth(), controller.listReceivedByAddress);
+app.get('/v1/listreceivedbyaccount', basicAuth(), controller.listReceivedByAccount);
+app.get('/v1/getreceivedbyaccount', basicAuth(), controller.getReceivedByAccount);
+app.get('/v1/getreceivedbyaddress/:address', basicAuth(), controller.getReceivedByAddress);
+app.post('/v1/sendtoaddress/:address/:amount', basicAuth(), controller.sendToAddress);
 
 app.listen('6421');
 
