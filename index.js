@@ -3,9 +3,11 @@ var controller = {};
 var express = require('express');
 var expressValidator = require('express-validator');
 
+var config = require(__dirname+"/config.js");
+
 dogecoin.set('user', 'dogegate');
-dogecoin.set('password', process.env.DOGECOIND_PASSWORD);
-dogecoin.auth('dogegate', process.env.DOGECOIND_PASSWORD);
+dogecoin.set('password', config.get('dogecoind_password'));
+dogecoin.auth('dogegate', config.get('dogecoind_password'));
 
 var app = express();
 app.use(expressValidator());
@@ -39,7 +41,6 @@ controller.listTransactions = function(req, res) {
   }); 
 
 };
-
 
 controller.getNewAddress = function(req, res) {
 
@@ -155,7 +156,7 @@ var BasicStrategy = require('passport-http').BasicStrategy;
 passport.use(new BasicStrategy(
   function(userid, password, done) {
     if (userid === 'admin'){
-      if (password === process.env.BASIC_AUTH_PASSWORD){
+      if (password === config.get('basic_auth_password')){
         done(null, true);
       } else {
         done(null, false);
