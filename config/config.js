@@ -5,7 +5,7 @@ config
   .env();
 
 config.defaults({
-  'dogecoind_password': ''
+  'dogecoind_password': '',
   'GATEWAY_URL': '',
   'GATEWAY_API_KEY': '',
   'TOTAL_RECEIVED': 0

@@ -3,7 +3,7 @@ var express = require('express');
 var expressValidator = require('express-validator');
 var dogecoinController = require(__dirname+"/lib/dogecoin_controller.js");
 
-var config = require(__dirname+"/config.js");
+var config = require(__dirname+"/config/config.js");
 
 var app = express();
 app.use(expressValidator());
@@ -38,7 +38,7 @@ app.get('/v1/getnewaddress', basicAuth(), dogecoinController.getNewAddress);
 app.get('/v1/gettransaction', basicAuth(), dogecoinController.getTransaction);
 app.get('/v1/listreceivedbyaddress', basicAuth(), dogecoinController.listReceivedByAddress);
 app.get('/v1/listreceivedbyaccount', basicAuth(), dogecoinController.listReceivedByAccount);
-app.get('/v1/listsinceblock/:block_hash', basicAuth(), dogecoinController.getReceivedByAddress);
+app.get('/v1/listsinceblock/:block_hash', basicAuth(), dogecoinController.listSinceBlock);
 app.get('/v1/getreceivedbyaccount', basicAuth(), dogecoinController.getReceivedByAccount);
 app.get('/v1/getreceivedbyaddress/:address', basicAuth(), dogecoinController.getReceivedByAddress);
 app.post('/v1/sendtoaddress/:address/:amount', basicAuth(), dogecoinController.sendToAddress);
