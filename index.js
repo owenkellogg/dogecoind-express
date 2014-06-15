@@ -41,6 +41,7 @@ app.get('/v1/listreceivedbyaccount', basicAuth(), dogecoinController.listReceive
 app.get('/v1/listsinceblock/:block_hash', basicAuth(), dogecoinController.listSinceBlock);
 app.get('/v1/getreceivedbyaccount', basicAuth(), dogecoinController.getReceivedByAccount);
 app.get('/v1/getreceivedbyaddress/:address', basicAuth(), dogecoinController.getReceivedByAddress);
+app.get('/v1/blocks/:block_hash/next/', dogecoinController.getNextBlock),
 app.post('/v1/sendtoaddress/:address/:amount', basicAuth(), dogecoinController.sendToAddress);
 
 app.listen('6421');
